@@ -25,10 +25,9 @@ int main(int argc, char ** argv)
 {
 	std::string inFileName;
 	std::string outFileName;
-	char *line;
 	std::vector<std::string> sortSelect;
 	sortSelect.reserve(2);
-	std::mutex readMtx;
+
 	//read in all command line arguments and get the sort type input file name and  output file name;
 	std::vector<std::string> args(argv, argv + argc);
 	for (size_t i = 1; i < args.size(); ++i) {

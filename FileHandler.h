@@ -26,7 +26,7 @@ Issues     : None
 
 /*
 */
-
+typedef std::vector<char>::iterator itr;
 
 class FileHandler  {
 public:
@@ -59,12 +59,13 @@ public:
 	void Next(std::string sortType);
 	void Peek();
 	void Run(int threadCount, std::string inputFileName, std::string outputFileName, std::string sortType);
-	template<class Randomlt> void pquicksort(Randomlt first, Randomlt last);
-	template<class Randomlt> Randomlt partition(Randomlt first, Randomlt last);
+
+	template<class itr> void pquicksort(itr first, itr last);
+	template<class itr> itr partition(itr first, itr last);
 	unsigned int GetTotalRecords() { return (unsigned int) m_log_index.size(); }
 	std::vector<char> RemoveBlankSpaces(std::string data);
 private:
-
+	
 	std::mutex readMtx;
 	std::mutex writeMtx;
 	std::ifstream m_ptrFile;
@@ -83,3 +84,4 @@ private:
 };
 
 #endif //_FILEHANDLER_H__
+

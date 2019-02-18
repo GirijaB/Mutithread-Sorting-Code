@@ -10,6 +10,7 @@
 #include <chrono>
 #include <future>
 #include <execution> 
+#include <iterator> 
 
 FileHandler::FileHandler()
 {
@@ -50,7 +51,8 @@ void FileHandler::Rewind()
 	m_nReadCurrentRecord = -1;
 }
 
-template<class Randomlt> void FileHandler::pquicksort(Randomlt first, Randomlt last)
+template<class itr>
+inline void FileHandler::pquicksort(itr first, itr last)
 {
 	if (first < last)
 	{
@@ -64,7 +66,8 @@ template<class Randomlt> void FileHandler::pquicksort(Randomlt first, Randomlt l
 	
 }
 
-template<class Randomlt> Randomlt FileHandler::partition(Randomlt first, Randomlt last)
+template<class itr>
+itr FileHandler::partition(itr first, itr last)
 {
 	auto pivot = *first;
 	auto i = first + 1;
@@ -73,7 +76,7 @@ template<class Randomlt> Randomlt FileHandler::partition(Randomlt first, Randoml
 	while (i <= j)
 	{
 		while (i <= j && *i <= pivot) i++;
-		while (i <= j && *j > pivot) j++;
+		while (i <= j && *j > pivot) j--;
 		if (i < j) std::iter_swap(i, j);
 	}
 	std::iter_swap(i - 1, first);
@@ -82,11 +85,12 @@ template<class Randomlt> Randomlt FileHandler::partition(Randomlt first, Randoml
 
 std::vector<char>  FileHandler::RemoveBlankSpaces(std::string data)
 {
-	std::vector<char> vec;
-	vec.reserve(data.size());
-	data.erase(std::remove(data.begin(), data.end(), ' '),data.end());
 	
-	vec.assign(data.begin(), data.end());
+	
+	data.erase(std::remove(data.begin(), data.end(), ' '),data.end());
+
+	std::vector<char> vec;
+	std::copy(data.begin(), data.end(), std::back_inserter(vec));
 	return vec;
 }
 
@@ -101,20 +105,36 @@ void FileHandler::Next(std::string sortType)
 
 	std::ifstream::pos_type pos = m_log_index[m_nReadCurrentRecord];
 	m_ptrFile.seekg(pos,std::ios::beg);
+
 	m_ptrFile.getline(sData,100);
 	std::string sortString = sData;
+	
 	std::vector<char> sortVect = RemoveBlankSpaces(sortString);
+	
 	//std::sort(sortVect.begin(), sortVect.end());
 	// same sort call as above, but with par_unseq:
-	if(sortType._Equal("ParallelSort"))
-	std::sort(std::execution::par_unseq, sortVect.begin(), sortVect.end());
-	//pquicksort(sortVect.begin(), sortVect.end());
-	m_ptrWriteFile.seekp(pos, std::ios::beg);
-	m_ptrWriteFile.write(reinterpret_cast<char*>(sortVect.data()), sortVect.size());
-	for (char &v : sortVect)
-		std::cout << v;
-	std::cout << std::endl;
-	return;
+	if (sortType._Equal("CPlusPlusSort"))
+	{		
+		std::sort(std::execution::par_unseq, sortVect.begin(), sortVect.end());
+		//std::cout << "\n Function running in thread = " << std::this_thread::get_id();
+		m_ptrWriteFile.seekp(pos, std::ios::beg);
+		m_ptrWriteFile.write(reinterpret_cast<char*>(sortVect.data()), sortVect.size());
+		
+	}
+	else if (sortType._Equal("ParallelSort"))
+	{
+		itr startElement = std::begin(sortVect);
+		itr endElement = std::end(sortVect);
+		pquicksort(startElement, endElement);
+		m_ptrWriteFile.seekp(pos, std::ios::beg);
+		m_ptrWriteFile.write(reinterpret_cast<char*>(sortVect.data()), sortVect.size());
+	}
+	else if (sortType._Equal("NoSort"))
+	{
+		m_ptrWriteFile.seekp(pos, std::ios::beg);
+		m_ptrWriteFile.write(reinterpret_cast<char*>(sortVect.data()), sortVect.size());
+	}
+
 }
 
 
@@ -137,18 +157,26 @@ void FileHandler::Peek()
 
 void FileHandler::Run(int threadCount, std::string inputFileName, std::string outputFileName, std::string sortType)
 {
-
+	
 	OpenReadFile(inputFileName.c_str());
 	OpenWriteFile(outputFileName.c_str());
+	std::vector<std::thread>threads;
+	threads.reserve(4);
 	unsigned int recCount = GetTotalRecords();
-	while (recCount>=0)
-	{
-		for (int i = 0; i < threadCount; i++) {
-			std::thread th(&FileHandler::Next, this, sortType);
-			th.join();
-		}
-		recCount--;
-	}
+
+		for (int j = 0; j < recCount / 4; j++)
+		{
+			for (int i = 0; i < 4; i++) {
+				std::thread th(&FileHandler::Next, this, sortType);
+				threads.push_back(std::move(th));
+			}
+			for (auto& thread : threads)
+			{
+				thread.join();
+			}
+			threads.clear();
+		}	
+
 }
 
 
