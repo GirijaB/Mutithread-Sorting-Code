@@ -1,8 +1,11 @@
 # Mutithread-Sorting-Code
 
 Tested Code with sort methods such as :-
+
 1)QuickSort(with 2 async tasks and without async tasks)
+
 2) c++17 std::sorting technique with execution policy and vectorization.
+
 Quick Sort with Async and without Async implementation gave results as below for 5mb file on a 2 core machine :-
                   
                           2 threads    4threads     6 threads
