@@ -17,4 +17,7 @@ c++17 sorting algorithm with execution policy gave an amazing execution speed of
 
 With No Sort and just writing the exisiting input file onto output file was executed in 45 seconds.
 
+Used Visual Studio 2017 , with C++17 and CMAKE so its platform independent.
+
+
 
