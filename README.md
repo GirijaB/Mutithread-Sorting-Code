@@ -6,7 +6,7 @@ Tested Code with sort methods such as :-
 
 2)  c++17 std::sorting technique with execution policy and vectorization.
 
-Quick Sort with Async and without Async implementation gave results as below for 5mb file on a 2 core machine :-
+Quick Sort with Async and without Async implementation gave results as below for 5mb file on a 4 core machine :-
                   
                           2 threads    4threads     6 threads
                           214 secs	    220 secs	   245 secs
