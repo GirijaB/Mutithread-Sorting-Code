@@ -136,8 +136,10 @@ void ParallelSort::Next(std::string sortType)
 		itr startElement = std::begin(sortVect);
 		itr endElement = std::end(sortVect);
 		pquicksort(startElement, endElement);
+		writeMtx.lock();
 		m_ptrWriteFile.seekp(pos, std::ios::beg);
 		m_ptrWriteFile.write(reinterpret_cast<char*>(sortVect.data()), sortVect.size());
+		writeMtx.unlock();
 	}
 	else if (sortType._Equal("NoSort"))
 	{
@@ -162,7 +164,7 @@ void ParallelSort::Peek()
 		return;
 }
 
-void ParallelSort::Run(int threadCount, std::string inputFileName, std::string outputFileName, std::string sortType)
+void ParallelSort::Run(int threadCount, std::string inputFileName, std::string outputFileName, std::vector<std::string> sortType)
 {
 	const high_resolution_clock::time_point t1 = high_resolution_clock::now();
 	OpenReadFile(inputFileName.c_str());
@@ -171,11 +173,12 @@ void ParallelSort::Run(int threadCount, std::string inputFileName, std::string o
 	std::vector<std::thread>threads;
 	threads.reserve(Max_Thread_Count);
 	const size_t recCount = GetTotalRecords();
-
+	for (auto sort : sortType)
+	{
 		for (unsigned int j = 0; j < recCount / Max_Thread_Count; j++)
 		{
 			for (int i = 0; i < Max_Thread_Count; i++) {
-				std::thread th(&ParallelSort::Next, this, sortType);
+				std::thread th(&ParallelSort::Next, this, sort);
 				threads.push_back(std::move(th));
 			}
 			for (auto& thread : threads)
@@ -183,10 +186,11 @@ void ParallelSort::Run(int threadCount, std::string inputFileName, std::string o
 				thread.join();
 			}
 			threads.clear();
-		}	
+		}
 		const high_resolution_clock::time_point t2 = high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(t2 - t1).count();
 		std::cout << duration;
+	}
 }
 
 

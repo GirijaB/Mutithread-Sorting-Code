@@ -63,9 +63,8 @@ int main(int argc, char ** argv)
 
 	
 	ParallelSort *readFile = new ParallelSort();
-	readFile->Run(max_concurrent_threads, inFileName, outFileName, sortSelect[2]);
+	readFile->Run(max_concurrent_threads, inFileName, outFileName, sortSelect);
 	return 0;
 }
-
 
 	

@@ -58,7 +58,7 @@ public:
 
 	void Next(std::string sortType);
 	void Peek();
-	void Run(int threadCount, std::string inputFileName, std::string outputFileName, std::string sortType);
+	void Run(int threadCount, std::string inputFileName, std::string outputFileName, std::vector<std::string> sortType);
 
 	template<class itr> void pquicksort(itr first, itr last);
 	template<class itr> itr partition(itr first, itr last);
