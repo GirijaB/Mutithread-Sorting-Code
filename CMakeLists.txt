@@ -4,7 +4,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
-add_executable (ProducerConsumer "TestProducerConsumer.cpp" "TestProducerConsumer.h" "FileHandler.h" "FileHandler.cpp")
-set_property(TARGET ProducerConsumer PROPERTY CXX_STANDARD 17)
-set_property(TARGET ProducerConsumer PROPERTY CXX_STANDARD_REQUIRED ON)
+add_executable (ParallelSort "ParallelSort.cpp" "ParallelSort.h" "main.h" "main.cpp")
+set_property(TARGET ParallelSort PROPERTY CXX_STANDARD 17)
+set_property(TARGET ParallelSort PROPERTY CXX_STANDARD_REQUIRED ON)
 # TODO: Add tests and install targets if needed.
