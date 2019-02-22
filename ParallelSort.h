@@ -37,7 +37,7 @@ public:
 	};
 
 	//enums to use for accessing file in fwd backward or in any direction.
-	typedef enum { FWD, BCK, ANY } enSEARCH_DIR;
+	typedef enum { e_FWD, e_BCK, e_ANY } enSEARCH_DIR;
 
 	//maximum size of characters a line in a file can hold
 	int m_maxLineData;
